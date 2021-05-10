@@ -1,10 +1,10 @@
-const express = require('express');
-const config = require('./config/server');
+const app = require('express')();
+const loader = require('./loaders/main');
 const routes = require('./api-routes/main');
-const app = express();
 
+loader.init(app);
 routes.init(app);
 
-app.listen(config.port, () => {
-    console.log(`This server is running at port ${config.port}`);
+app.listen(process.env.PORT, () => {
+    console.log(`This server is running at port ${process.env.PORT}`);
 });

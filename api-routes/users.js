@@ -10,7 +10,16 @@ class Route {
         this.app.post('/users/reset-password', this.handleResetPassword);
     }
 
-    handleLogin(req, res) {}
+    handleLogin(req, res) {
+        let username = req.body.username;
+        let password = req.body.password;
+        if (username == "ntl" && password == "ntl") {
+            res.status(200).json({message: "OK"});
+        } else {
+            res.status(401).json({message: "Failed"});
+        }
+        
+    }
     handleLogout(req, res) {}
     handleSignup(req, res) {}
     handleResetPassword(req, res) {}
