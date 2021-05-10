@@ -6,7 +6,31 @@ const dbConnection = require('./mysql');
 class Model {
 
     generateAccessToken(username) {
-        return jwt.sign(username, process.env.JWT_TOKEN_SECRET, {expiresIn: '1800s'});
+        return jwt.sign({user: username}, process.env.JWT_TOKEN_SECRET, {expiresIn: 60 * 5});
+    }
+
+    async checkValidLogin(username, password) {
+        if (username === undefined || 
+            password === undefined
+        ) {
+            return {status: 0, error: 'Invalid request'};
+        }
+        password = crypto.createHash('sha256').update(password).digest('hex');
+        return new Promise((resolve, _) => {
+            const sql = "SELECT COUNT(*) FROM User WHERE name = ? AND password = ?";
+            dbConnection.query(sql, [username, password], function(err, result, _) {
+                if (err) resolve({status: 0, error: err.sqlMessage});
+                else {
+                    const userCount = result[0]["COUNT(*)"];
+                    if (userCount == 0) {
+                        resolve({status: 0, error: "This account is not existed in the system"});
+                    } else {
+                        resolve({status: 1, error: null});
+                    }
+                    
+                }
+            });
+        });
     }
 
     async checkValidSignup(requestBody) {

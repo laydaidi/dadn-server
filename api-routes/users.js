@@ -10,15 +10,16 @@ class Route {
         this.app.post('/users/reset-password', this.handleResetPassword);
     }
 
-    handleLogin(req, res) {
-        let username = req.body.username;
-        let password = req.body.password;
-        if (username == 'ntl' && password == 'ntl') {
-            res.status(200).json({message: 'OK'});
-        } else {
-            res.status(401).json({message: 'Failed'});
+    async handleLogin(req, res) {
+        const {username, password} = req.body;
+        var {status, error} = await UsersModel.checkValidLogin(username, password);
+        if (status == 0) {
+            res.status(401).json({message: error});
+            return;
         }
         
+        const accessToken = UsersModel.generateAccessToken(username);
+        res.status(200).json({accessToken: accessToken});
     }
     
     handleLogout(req, res) {}
@@ -26,16 +27,16 @@ class Route {
     async handleSignup(req, res) {
         var {status, error} = await UsersModel.checkValidSignup(req.body);
         if (status == 0) {
-            res.status(406).json({'message': error});
+            res.status(406).json({message: error});
             return;
         }
         
         var {status, error} = await UsersModel.create(req.body);
         if (status == 0) {
-            res.status(403).json({'message': error});
+            res.status(403).json({message: error});
             return;
         }
-        res.status(201).json({'message': 'ok'});
+        res.status(201).json({message: 'ok'});
     }
     
     handleResetPassword(req, res) {}
