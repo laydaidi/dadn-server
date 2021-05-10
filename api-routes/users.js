@@ -20,18 +20,24 @@ class Route {
         }
         
     }
+    
     handleLogout(req, res) {}
     
-    handleSignup(req, res) {
-        const {status, error} = UsersModel.checkValidSignup(req.body);
+    async handleSignup(req, res) {
+        var {status, error} = await UsersModel.checkValidSignup(req.body);
         if (status == 0) {
             res.status(406).json({'message': error});
-        } else {
-            UsersModel.create(req.body);
-            res.status(201).json({'message': 'ok'});
+            return;
         }
-
+        
+        var {status, error} = await UsersModel.create(req.body);
+        if (status == 0) {
+            res.status(403).json({'message': error});
+            return;
+        }
+        res.status(201).json({'message': 'ok'});
     }
+    
     handleResetPassword(req, res) {}
 }
 
