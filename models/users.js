@@ -1,13 +1,8 @@
-const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const crypto = require('crypto');
 const dbConnection = require('./mysql');
 
 class Model {
-
-    generateAccessToken(username) {
-        return jwt.sign({user: username}, process.env.JWT_TOKEN_SECRET, {expiresIn: 60 * 5});
-    }
 
     async checkValidLogin(username, password) {
         if (username === undefined || 
