@@ -1,4 +1,4 @@
-class Routes {
+class Route {
     constructor() {}
     init(app) {
         const routes = [
@@ -17,4 +17,4 @@ class Routes {
 }
 
 
-module.exports = new Routes();
+module.exports = new Route();
