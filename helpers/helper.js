@@ -19,23 +19,23 @@ module.exports = {
         }
     },
 
-    generateAccessToken: (username) => {
-        return jwt.sign({user: username}, process.env.JWT_TOKEN_SECRET, {expiresIn: process.env.JWT_EXPIRES});
+    generateAccessToken: (userName) => {
+        return jwt.sign({userName: userName}, process.env.JWT_TOKEN_SECRET, {expiresIn: process.env.JWT_EXPIRES});
     },
 
-    generateRefreshToken: (username) => {
-        return jwt.sign({user: username}, process.env.JWT_REFRESH_TOKEN_SECRET);
+    generateRefreshToken: (userName) => {
+        return jwt.sign({userName: userName}, process.env.JWT_REFRESH_TOKEN_SECRET);
     },
 
     verifyResetToken: (token) => {
         return new Promise((resolve, _) => {
-            jwt.verify(token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, user) => {
+            jwt.verify(token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
                 if (err) {
                     resolve({status: 0, message: 'invalid token'});
                     return;
                 }
-                const {user: username} = user;
-                const accessToken = module.exports.generateAccessToken(username);
+                const {userName: userName} = data;
+                const accessToken = module.exports.generateAccessToken(userName);
                 resolve({status: 1, message: accessToken});
             });
         });

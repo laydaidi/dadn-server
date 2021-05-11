@@ -1,4 +1,5 @@
 drop table if exists `ConnectionHistory`;
+drop table if exists `UserRefreshToken`;
 drop table if exists `User`;
 drop table if exists `Device`;
 drop table if exists `Tutorial`;
@@ -8,11 +9,18 @@ create table `User` (
     `phone` varchar(10) unique not null,
     `email` varchar(128) unique not null,
     `password` varchar(64) not null,
-    `name` varchar(128) not null,
+    `name` varchar(128) unique not null,
     `gender` int(1) null,
     `birthday` date null,
     `address` text null,
     `create_date` datetime default current_timestamp()
+);
+
+create table `UserRefreshToken` (
+    `id` int(11) primary key not null auto_increment,
+    `username` varchar(128) not null,
+    `token` text not null,
+    foreign key (`username`) references `User`(`name`)
 );
 
 create table `Device` (

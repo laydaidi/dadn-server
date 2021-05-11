@@ -1,7 +1,5 @@
 const UsersModel = require('../models/users');
-const Middleware = require('../helpers/middleware');
-
-var refreshTokens = [];
+const Helpers = require('../helpers/helper');
 
 class Route {
     constructor() {}
@@ -13,43 +11,62 @@ class Route {
         this.app.post('/users/token', this.handleResetToken);
         this.app.post('/users/reset-password', this.handleResetPassword);
 
-        this.app.get('/users/information', Middleware.authenticateJWT, this.handleInformation);
+        this.app.get('/users/information', Helpers.authenticateJWT, this.handleInformation);
+        this.app.post('/users/save-information', Helpers.authenticateJWT, this.handleSaveInformation);
     }
 
     async handleLogin(req, res) {
-        const {username, password} = req.body;
-        var {status, error} = await UsersModel.checkValidLogin(username, password);
+        const {
+            username: userName, 
+            password: password
+        } = req.body;
+
+        var {status, error} = await UsersModel.checkValidLogin(userName, password);
         if (status == 0) {
             res.status(401).json({message: error});
             return;
         }
         
-        const accessToken = Middleware.generateAccessToken(username);
-        const refreshToken = Middleware.generateRefreshToken(username);
-        refreshTokens.push(refreshToken);
+        const accessToken = Helpers.generateAccessToken(userName);
+        const refreshToken = Helpers.generateRefreshToken(userName);
+        var {status, error} = await UsersModel.saveRefreshToken(userName, refreshToken);
+        if (status == 0) {
+            res.status(401).json({message: error});
+            return;
+        }
         res.status(200).json({accessToken: accessToken, refreshToken: refreshToken});
     }
     
-    handleLogout(req, res) {
-        const { token } = req.body;
-        refreshTokens = refreshTokens.filter(t => t !== token);
+    async handleLogout(req, res) {
+        const { 
+            token: token 
+        } = req.body;
+
+        var {status, error} = await UsersModel.removeRefreshToken(token);
+        if (status == 0) {
+            res.status(401).json({message: error});
+            return;
+        }
         res.status(200).json({message: 'ok'});
     }
 
     async handleResetToken(req, res) {
-        const { token } = req.body;
+        const { 
+            token: token 
+        } = req.body;
 
         if (!token) {
             res.status(401).json({message: 'invalid token'});
             return;
         }
 
-        if (!refreshTokens.includes(token)) {
-            res.status(403).json({message: 'invalid token'});
+        var {status, error} = await UsersModel.checkExistRefreshToken(token);
+        if (status == 0) {
+            res.status(403).json({message: error});
             return;
         }
 
-        const {status, message} = await Middleware.verifyResetToken(token);
+        var {status, message} = await Helpers.verifyResetToken(token);
         if (status == 0) {
             res.status(403).json({message: message});
             return;
@@ -58,13 +75,20 @@ class Route {
     }
     
     async handleSignup(req, res) {
-        var {status, error} = await UsersModel.checkValidSignup(req.body);
+        var {
+            status: status, 
+            error: error
+        } = await UsersModel.checkValidSignup(req.body);
         if (status == 0) {
             res.status(406).json({message: error});
             return;
         }
         
-        var {status, error} = await UsersModel.create(req.body);
+        var {
+            status: status, 
+            error: error
+        } = await UsersModel.create(req.body);
+
         if (status == 0) {
             res.status(403).json({message: error});
             return;
@@ -72,18 +96,40 @@ class Route {
         res.status(201).json({message: 'ok'});
     }
     
-    handleResetPassword(req, res) {}
+    async handleResetPassword(req, res) {
+        var {status, error} = await UsersModel.resetPassword(req.body);
+        if (status == 0) {
+            res.status(401).json({message: error});
+            return;
+        }
+        res.status(200).json({message: 'ok'});
+    }
 
     async handleInformation(req, res) {
 
-        const {user: username} = req.user;
+        const {
+            userName: userName
+        } = req.user;
 
-        var {status, info} = await UsersModel.getInformation(username);
+        var {status, info} = await UsersModel.getInformation(userName);
         if (status == 0) {
             res.status(403).json({message: info});
             return;
         }
         res.status(200).json({info: info});
+    }
+
+    async handleSaveInformation(req, res) {
+        const {
+            userName: userName
+        } = req.user;
+
+        var {status, error} = await UsersModel.saveInformation(userName, req.body);
+        if (status == 0) {
+            res.status(403).json({message: error});
+            return;
+        }
+        res.status(200).json({message: 'ok'});
     }
 }
 
