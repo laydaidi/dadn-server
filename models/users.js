@@ -83,6 +83,16 @@ class Model {
         });
     }
 
+    async getInformation(username) {
+        return new Promise((resolve, _) => {
+            const sql = "SELECT name, email, phone, gender, birthday, address FROM User WHERE name = ?";
+            dbConnection.query(sql, [username], function(err, result) {
+                if (err) resolve({status: 0, info: err.sqlMessage});
+                else resolve({status: 1, info: result[0]});
+            });
+        });
+    }
+
 }
 
 module.exports = new Model();

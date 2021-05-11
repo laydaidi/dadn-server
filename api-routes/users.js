@@ -12,6 +12,8 @@ class Route {
         this.app.post('/users/signup', this.handleSignup);
         this.app.post('/users/token', this.handleResetToken);
         this.app.post('/users/reset-password', this.handleResetPassword);
+
+        this.app.get('/users/information', Middleware.authenticateJWT, this.handleInformation);
     }
 
     async handleLogin(req, res) {
@@ -71,6 +73,18 @@ class Route {
     }
     
     handleResetPassword(req, res) {}
+
+    async handleInformation(req, res) {
+
+        const {user: username} = req.user;
+
+        var {status, info} = await UsersModel.getInformation(username);
+        if (status == 0) {
+            res.status(403).json({message: info});
+            return;
+        }
+        res.status(200).json({info: info});
+    }
 }
 
 module.exports = new Route();
