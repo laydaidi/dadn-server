@@ -18,7 +18,7 @@ class Model {
                 else {
                     const userCount = result[0]["COUNT(*)"];
                     if (userCount == 0) {
-                        resolve({status: 0, error: "This account is not existed in the system"});
+                        resolve({status: 0, error: "Your username or password is not correct"});
                     } else {
                         resolve({status: 1, error: null});
                     }
@@ -159,12 +159,13 @@ class Model {
             email: email,
             phone: phone,
             birthday: birthday,
+            gender: gender,
             address: address
         } = data;
 
         return new Promise((resolve, _) => {
-            const sql = "UPDATE User SET email = ?, phone = ?, birthday = ?, address = ? WHERE name = ?";
-            dbConnection.query(sql, [email, phone, birthday, address, userName], function(err, _) {
+            const sql = "UPDATE User SET email = ?, phone = ?, birthday = ?, gender = ?, address = ? WHERE name = ?";
+            dbConnection.query(sql, [email, phone, birthday, gender, address, userName], function(err, _) {
                 if (err) resolve({status: 0, error: err.sqlMessage});
                 else resolve({status: 1, error: null});
             });
