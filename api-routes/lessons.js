@@ -1,4 +1,4 @@
-const Model = require('../models/lessons');
+const LessonModel = require('../models/lessons');
 
 class Route {
     constructor() {}
@@ -8,7 +8,19 @@ class Route {
         this.app.get('/lessons/view/:lessionId', this.handleView);
     }
 
-    handleList(req, res) {}
+    async handleList(req, res) {
+        // const {
+        //     userName: userName
+        // } = req.user;
+
+        var {status, lessons} = await LessonModel.getLessonList();
+        if (status == 0) {
+            res.status(403).json({message: lessons});
+            return;
+        }
+        res.status(200).json({lessons: lessons});
+    }
+
     handleView(req, res) {}
 }
 
