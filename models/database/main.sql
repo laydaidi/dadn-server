@@ -1,8 +1,9 @@
 drop table if exists `ConnectionHistory`;
 drop table if exists `UserRefreshToken`;
+drop table if exists `Tutorial`;
 drop table if exists `User`;
 drop table if exists `Device`;
-drop table if exists `Tutorial`;
+
 
 create table `User` (
     `id` int(11) primary key not null auto_increment,
@@ -44,6 +45,6 @@ create table `Tutorial` (
     `type` int(1) not null,
     `description` text null,
     `url` varchar(256) unique not null,
-    `user_id` int(11) not null,
-    foreign key (`user_id`) references `User`(`id`)
+    `user_name` varchar(128) not null,
+    foreign key (`user_name`) references `User`(`name`)
 );

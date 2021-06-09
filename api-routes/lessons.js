@@ -12,13 +12,11 @@ class Route {
     }
 
     async handleList(req, res) {
-        // const {
-        //     userName: userName
-        // } = req.user;
+        const {
+            userName: userName
+        } = req.user;
 
-        console.log(req.user)
-
-        var {status, lessons} = await LessonModel.getLessonList();
+        var {status, lessons} = await LessonModel.getLessonList(userName);
         if (status == 0) {
             res.status(403).json({message: lessons});
             return;
@@ -28,10 +26,14 @@ class Route {
 
     async handleView(req, res) {
         const {
+            userName: userName
+        } = req.user;
+
+        const {
             lessonId
         } = req.params;
 
-        var {status, lesson} = await LessonModel.getLesson(lessonId);
+        var {status, lesson} = await LessonModel.getLesson(lessonId, userName);
         if (status == 0) {
             res.status(403).json({message: lesson});
             return;
@@ -41,10 +43,14 @@ class Route {
 
     async handleDownloadVideo(req, res) {
         const {
+            userName: userName
+        } = req.user;
+
+        const {
             videoName
         } = req.params;
 
-        const path = __basedir + "/videos/" + videoName;
+        const path = __basedir + "/videos/" + userName + "/" + videoName;
         console.log(path)
 
         res.download(path, videoName, (err) => {
