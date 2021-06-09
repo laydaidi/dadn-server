@@ -1,20 +1,22 @@
 const LessonModel = require('../models/lessons');
 const url = require('url');
-
+const Helpers = require('../helpers/helper');
 
 class Route {
     constructor() {}
     init(app) {
         this.app = app;
-        this.app.get('/lessons/list', this.handleList);
-        this.app.get('/lessons/view/:lessonId', this.handleView);
-        this.app.get('/video/:videoName', this.handleDownloadVideo);
+        this.app.get('/lessons/list', Helpers.authenticateJWT, this.handleList);
+        this.app.get('/lessons/view/:lessonId', Helpers.authenticateJWT , this.handleView);
+        this.app.get('/video/:videoName', Helpers.authenticateJWT ,this.handleDownloadVideo);
     }
 
     async handleList(req, res) {
         // const {
         //     userName: userName
         // } = req.user;
+
+        console.log(req.user)
 
         var {status, lessons} = await LessonModel.getLessonList();
         if (status == 0) {

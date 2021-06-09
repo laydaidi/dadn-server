@@ -43,5 +43,7 @@ create table `Tutorial` (
     `name` varchar(128) unique not null,
     `type` int(1) not null,
     `description` text null,
-    `url` varchar(256) unique not null
+    `url` varchar(256) unique not null,
+    `user_id` int(11) not null,
+    foreign key (`user_id`) references `User`(`id`)
 );
