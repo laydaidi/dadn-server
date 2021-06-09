@@ -51,7 +51,6 @@ class Route {
         } = req.params;
 
         const path = __basedir + "/videos/" + userName + "/" + videoName;
-        console.log(path)
 
         res.download(path, videoName, (err) => {
             if (err) {
